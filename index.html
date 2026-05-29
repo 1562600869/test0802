@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>汽车保养管理系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f7fa;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        header h1 {
+            font-size: 28px;
+            font-weight: 600;
+        }
+        
+        header p {
+            opacity: 0.9;
+            margin-top: 5px;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .tab-btn {
+            padding: 12px 24px;
+            border: none;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 500;
+            color: #666;
+            transition: all 0.3s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        .tab-btn:hover {
+            background: #f0f2f5;
+        }
+        
+        .tab-btn.active {
+            background: #667eea;
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            margin-bottom: 20px;
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .card-header h2 {
+            font-size: 20px;
+            font-weight: 600;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #5a6fd8;
+        }
+        
+        .btn-danger {
+            background: #ff6b6b;
+            color: white;
+            padding: 6px 12px;
+            font-size: 13px;
+        }
+        
+        .btn-danger:hover {
+            background: #ee5a5a;
+        }
+        
+        .btn-secondary {
+            background: #e9ecef;
+            color: #495057;
+            padding: 6px 12px;
+            font-size: 13px;
+        }
+        
+        .btn-secondary:hover {
+            background: #dde2e6;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .form-group label {
+            font-size: 13px;
+            font-weight: 500;
+            color: #666;
+            margin-bottom: 6px;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 10px 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 14px 12px;
+            text-align: left;
+            border-bottom: 1px solid #f0f2f5;
+        }
+        
+        th {
+            font-size: 13px;
+            font-weight: 600;
+            color: #666;
+            background: #fafbfc;
+        }
+        
+        td {
+            font-size: 14px;
+        }
+        
+        tr:hover {
+            background: #fafbfc;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .badge-overdue {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+        
+        .badge-soon {
+            background: #fef3c7;
+            color: #d97706;
+        }
+        
+        .badge-normal {
+            background: #d1fae5;
+            color: #059669;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .modal-header h3 {
+            font-size: 20px;
+            font-weight: 600;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #999;
+        }
+        
+        .close-btn:hover {
+            color: #333;
+        }
+        
+        .modal-footer {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+        
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+        
+        .vehicle-info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .vehicle-info p {
+            margin: 5px 0;
+            font-size: 14px;
+        }
+        
+        .vehicle-info strong {
+            color: #666;
+            margin-right: 8px;
+        }
+        
+        .cost {
+            font-weight: 600;
+            color: #667eea;
+        }
+        
+        .plate-number {
+            background: #1e40af;
+            color: white;
+            padding: 3px 10px;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 13px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+        }
+        
+        .stat-number {
+            font-size: 32px;
+            font-weight: 700;
+            color: #667eea;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .warning-text {
+            color: #dc2626;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🚗 汽车保养管理系统</h1>
+            <p>专业的车辆保养记录追踪与提醒工具</p>
+        </header>
+        
+        <div class="stats-grid" id="statsGrid"></div>
+        
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="reminders">📋 保养提醒</button>
+            <button class="tab-btn" data-tab="vehicles">🚙 车辆档案</button>
+            <button class="tab-btn" data-tab="records">📝 保养记录</button>
+        </div>
+        
+        <div id="reminders" class="tab-content active">
+            <div class="card">
+                <div class="card-header">
+                    <h2>到期保养提醒</h2>
+                    <button class="btn btn-primary" onclick="loadReminders()">🔄 刷新</button>
+                </div>
+                <div id="remindersTable"></div>
+            </div>
+        </div>
+        
+        <div id="vehicles" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <h2>车辆档案</h2>
+                    <button class="btn btn-primary" onclick="openVehicleModal()">➕ 添加车辆</button>
+                </div>
+                <div id="vehiclesTable"></div>
+            </div>
+        </div>
+        
+        <div id="records" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <h2>保养记录</h2>
+                    <button class="btn btn-primary" onclick="openRecordModal()">➕ 添加记录</button>
+                </div>
+                <div id="recordsTable"></div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal" id="vehicleModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="vehicleModalTitle">添加车辆</h3>
+                <button class="close-btn" onclick="closeVehicleModal()">&times;</button>
+            </div>
+            <form id="vehicleForm" onsubmit="saveVehicle(event)">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>车牌号 *</label>
+                        <input type="text" name="plate_number" required placeholder="如：京A12345">
+                    </div>
+                    <div class="form-group">
+                        <label>品牌型号 *</label>
+                        <input type="text" name="brand_model" required placeholder="如：大众 帕萨特">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>车主姓名 *</label>
+                        <input type="text" name="owner_name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>手机号 *</label>
+                        <input type="tel" name="phone" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>购车日期 *</label>
+                        <input type="date" name="purchase_date" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeVehicleModal()">取消</button>
+                    <button type="submit" class="btn btn-primary">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <div class="modal" id="recordModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>添加保养记录</h3>
+                <button class="close-btn" onclick="closeRecordModal()">&times;</button>
+            </div>
+            <form id="recordForm" onsubmit="saveRecord(event)">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>车辆 *</label>
+                        <select name="vehicle_id" required id="vehicleSelect"></select>
+                    </div>
+                    <div class="form-group">
+                        <label>保养类型 *</label>
+                        <select name="maintenance_type" required id="maintenanceTypeSelect"></select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>日期 *</label>
+                        <input type="date" name="date" required>
+                    </div>
+                    <div class="form-group">
+                        <label>里程(km) *</label>
+                        <input type="number" name="mileage" required min="0" placeholder="当前里程">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>费用(分) *</label>
+                        <input type="number" name="cost" required min="0" placeholder="整数，单位：分">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>备注</label>
+                    <textarea name="notes" rows="3" placeholder="保养详情、更换零件等"></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeRecordModal()">取消</button>
+                    <button type="submit" class="btn btn-primary">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <div class="modal" id="historyModal">
+        <div class="modal-content" style="max-width: 800px;">
+            <div class="modal-header">
+                <h3>车辆保养历史</h3>
+                <button class="close-btn" onclick="closeHistoryModal()">&times;</button>
+            </div>
+            <div id="vehicleInfo" class="vehicle-info"></div>
+            <div id="historyTable"></div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeHistoryModal()">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
